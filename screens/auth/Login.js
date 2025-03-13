@@ -6,7 +6,7 @@ import navigation from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 
 
-const LoginScreen = () => {
+const LoginScreen = ({ setValue }) => {
     const navigation = useNavigation();
 
     const [username, setUsername] = useState("");
@@ -44,7 +44,8 @@ const LoginScreen = () => {
                 const id = res.data.data.id;
                 await AsyncStorage.setItem("token", res.data.token);
                 await AsyncStorage.setItem("teacher-id", id.toString());
-                navigation.navigate("Home");
+                // navigation.navigate("Home");
+                setValue(res.data.token);
             }
         } catch (error) {
             setLoading(false);
@@ -69,7 +70,7 @@ const LoginScreen = () => {
     };
     return (
         <View style={styles.container}>
-            <Image source={require("../../assets/sjsc.png")} style={styles.logo} />
+            <Image source={require("../../assets/sjsc.jpeg")} style={styles.logo} />
             <Text style={styles.schoolName}>St. Joseph's School and College</Text>
             <Text style={styles.signInText}>Sign In</Text>
             {error &&

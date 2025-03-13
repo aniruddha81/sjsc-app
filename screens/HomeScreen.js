@@ -27,7 +27,7 @@ const Menus = [
     },
 ];
 
-export default function HomeScreen() {
+export default function HomeScreen({ setValue }) {
     const navigation = useNavigation();
 
     return (
@@ -49,7 +49,20 @@ export default function HomeScreen() {
             {Menus.map((menu, index) => (
                 <Card key={index} item={menu.item} icon={menu.icon} href={menu.href} />
             ))}
-
+            <TouchableOpacity
+                style={{
+                    padding: 10,
+                    backgroundColor: 'red',
+                    borderRadius: 5,
+                    alignItems: 'center',
+                }}
+                onPress={() => {
+                    AsyncStorage.removeItem('token');
+                    // navigation.navigate('Login');
+                    setValue(null);
+                }}>
+                <Text>Logout</Text>
+            </TouchableOpacity>
 
         </View>
     );

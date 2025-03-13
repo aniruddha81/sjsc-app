@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { use } from 'react';
@@ -7,6 +7,8 @@ import { ScrollView, ActivityIndicator, Text, StyleSheet, View, FlatList, Toucha
 
 
 export default function TakeAttendance() {
+    const navigation = useNavigation();
+
     const route = useRoute();
     const { classId, groupId, sectionId, className, groupName, sectionName, attendanceId } = route.params || {};
 
@@ -19,6 +21,9 @@ export default function TakeAttendance() {
     const fetchStudents = async () => {
         try {
             setLoading(true);
+            if (!classId ) {
+                alert('Invalid classId or groupId');
+            }
             const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/students/fetch?classId=${classId}&groupId=${groupId}&sectionId=${sectionId || ''}`);
             setData(res.data);
         } catch (error) {
@@ -62,7 +67,8 @@ export default function TakeAttendance() {
                 status: selectedStudents.includes(student.id) ? "Present" : "Absent",
             }));
 
-
+            console.log("Student Records", studentRecords);
+            console.log("Attendance ID", attendanceId);
             // Submit attendance data
             const response = await axios.post(
                 `https://sjsc-backend-production.up.railway.app/api/v1/attendance/take/attendance`,
@@ -79,12 +85,19 @@ export default function TakeAttendance() {
 
             if (response.status === 201) {
                 alert("Attendance recorded successfully!");
+                navigation.navigate('Home');
             } else {
                 alert("Unexpected response from the server");
             }
             setProccessing(false);
         } catch (error) {
-            console.error("Error submitting attendance:", error);
+            if (error.response) {
+                alert(error.response.data.message);
+                navigation.navigate('Home');
+            } else {
+                console.error("Error message:", error.message);
+            }
+            setProccessing(false);
         }
     };
 
@@ -100,14 +113,12 @@ export default function TakeAttendance() {
         <View style={styles.container}>
             <View style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-end',
                 alignItems: 'center',
                 padding: 6,
-                borderBottomWidth: 1,
-                borderBottomColor: '#ccc'
             }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}
-                >{className} | {groupName} | {sectionName || ""}  </Text>
+                {/* <Text style={{ fontSize: 16, fontWeight: 'bold' }}
+                >{className} | {groupName} | {sectionName || ""}  </Text> */}
                 <TouchableOpacity
                     style={{ padding: 10, color: 'blue' }}
                     onPress={ToggleselectAll}

@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView  } from 'react-native';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
@@ -36,10 +36,9 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         {
-          value === null ?
+          value === null ? (
             <Stack.Screen
               name="Login"
-              component={LoginScreen}
               options={{
                 title: 'Login',
                 headerStyle: { backgroundColor: '#111' },
@@ -47,75 +46,89 @@ export default function App() {
                 headerTitleStyle: { fontWeight: 'bold' },
                 headerTextAlign: 'center'
               }}
-            />
-            :
-            (
-              <>
-                <Stack.Screen
-                  name="Home"
-                  component={HomeScreen}
-                  options={{
-                    header: () => <Header />,
-                  }}
-                />
-                <Stack.Screen
-                  name="Attendance"
-                  component={Attendance}
-                  options={{
-                    title: 'Attendance',
-                    headerStyle: { backgroundColor: '#111' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
-                    headerTextAlign: 'center'
-                  }}
-                />
-                <Stack.Screen
-                  name="TakeAttendance"
-                  component={TakeAttendance}
-                  options={{
-                    title: 'Attendance',
-                    headerStyle: { backgroundColor: '#111' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
-                    headerTextAlign: 'center'
-                  }}
-                />
-                <Stack.Screen
-                  name="Marks"
-                  component={Marks}
-                  options={{
-                    title: 'Attendance',
-                    headerStyle: { backgroundColor: '#111' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
-                    headerTextAlign: 'center'
-                  }}
-                />
-                <Stack.Screen
-                  name="Notice"
-                  component={Notice}
-                  options={{
-                    title: 'Attendance',
-                    headerStyle: { backgroundColor: '#111' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
-                    headerTextAlign: 'center'
-                  }}
-                />
-                <Stack.Screen
-                  name="Teachers"
-                  component={Teachers}
-                  options={{
-                    title: 'Teachers',
-                    headerStyle: { backgroundColor: '#111' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
-                    headerTextAlign: 'center'
-                  }}
-                />
-              </>
+            >
+              {(props) => (
+                <SafeAreaView style={{ flex: 1 }}>
+                  <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <LoginScreen {...props} setValue={setValue} />
+                  </ScrollView>
+                </SafeAreaView>
+              )}
+            </Stack.Screen>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Home"
+                options={{
+                  header: () => <Header />,
+                }}
+              >
+                {(props) => (
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                      <HomeScreen {...props} setValue={setValue} />
+                    </ScrollView>
+                  </SafeAreaView>
+                )}
+              </Stack.Screen>
 
-            )
+              <Stack.Screen
+                name="Attendance"
+                component={Attendance}
+                options={{
+                  title: 'Attendance',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="TakeAttendance"
+                component={TakeAttendance}
+                options={{
+                  title: 'Attendance',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="Marks"
+                component={Marks}
+                options={{
+                  title: 'Marks',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="Notice"
+                component={Notice}
+                options={{
+                  title: 'Notice',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="Teachers"
+                component={Teachers}
+                options={{
+                  title: 'Teachers',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              />
+            </>
+          )
         }
       </Stack.Navigator>
     </NavigationContainer>

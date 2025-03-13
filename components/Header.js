@@ -4,11 +4,12 @@ import { View, StyleSheet, Text, Image } from 'react-native';
 const Header = () => {
     return (
         <View style={styles.header}>
-            <Image source={require('../assets/sjsc.png')} style={{ width: 50, height: 50 }} />
+            <Image source={require('../assets/sjsc.jpeg')} style={{ width: 50, height: 50 }} />
             <View>
                 <Text style={styles.text}>St. Joseph's School and College</Text>
                 <Text style={{ color: "white" }}>Bonpara, Natore.</Text>
             </View>
+            
         </View>
     );
 };
