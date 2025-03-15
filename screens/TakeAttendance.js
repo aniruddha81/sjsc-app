@@ -56,7 +56,7 @@ export default function TakeAttendance() {
 
     // Unselected students
     const unselectedStudents = data.filter(student => !selectedStudents.includes(student.id)).map(student => student.id);
-    console.log("Absent Students", unselectedStudents);
+    // console.log("Absent Students", unselectedStudents);
 
     const handleSubmit = async () => {
         try {
@@ -85,7 +85,7 @@ export default function TakeAttendance() {
 
             if (response.status === 201) {
                 alert("Attendance recorded successfully!");
-                navigation.navigate('Home');
+                navigation.navigate('ViewAttendance', { id: attendanceId });
             } else {
                 alert("Unexpected response from the server");
             }

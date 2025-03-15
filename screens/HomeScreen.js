@@ -16,8 +16,8 @@ const Menus = [
         href: 'Marks',
     },
     {
-        item: 'Notice',
-        icon: 'note',
+        item: 'Attendance History',
+        icon: 'history',
         href: 'Notice',
     },
     {
@@ -27,16 +27,8 @@ const Menus = [
     },
 ];
 
-export default function HomeScreen({ setValue }) {
-    const navigation = useNavigation();
-
+export default function HomeScreen() {
     return (
-        // <Button
-        //     title="Go to Jane's profile"
-        //     onPress={() =>
-        //         navigation.navigate('Dashboard')
-        //     }
-        // />
         <View style={{
             flex: 1,
             flexDirection: 'row',
@@ -49,20 +41,7 @@ export default function HomeScreen({ setValue }) {
             {Menus.map((menu, index) => (
                 <Card key={index} item={menu.item} icon={menu.icon} href={menu.href} />
             ))}
-            <TouchableOpacity
-                style={{
-                    padding: 10,
-                    backgroundColor: 'red',
-                    borderRadius: 5,
-                    alignItems: 'center',
-                }}
-                onPress={() => {
-                    AsyncStorage.removeItem('token');
-                    // navigation.navigate('Login');
-                    setValue(null);
-                }}>
-                <Text>Logout</Text>
-            </TouchableOpacity>
+           
 
         </View>
     );

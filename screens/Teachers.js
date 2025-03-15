@@ -15,7 +15,7 @@ const fetchTeachers = async () => {
 
 const TeacherCard = ({ teacher }) => (
     <ListItem bottomDivider containerStyle={{ borderRadius: 10, marginVertical: 5 }}>
-        <Avatar rounded size="medium" source={{ uri: "https://randomuser.me/api/portraits/men/1.jpg" }} />
+        <Avatar rounded size="medium" source={{ uri: "https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png" }} />
         <ListItem.Content>
             <ListItem.Title style={{ fontWeight: "bold" }}>{teacher.name}</ListItem.Title>
 

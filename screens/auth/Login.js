@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import navigation from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
+import { Icon } from "react-native-elements";
 
 
 const LoginScreen = ({ setValue }) => {
@@ -100,20 +100,23 @@ const LoginScreen = ({ setValue }) => {
                     value={password}
                     onChangeText={setPassword}
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Text style={styles.eyeIcon}>{showPassword ? "🙈" : "👁️"}</Text>
+                <TouchableOpacity 
+                    style={styles.eyeIcon}
+                    onPress={() => setShowPassword(!showPassword)}>
+                    <Icon
+                        name={showPassword ? "eye-off" : "eye"} // Toggle between eye and eye-off icons
+                        type="feather" // Use Feather icons
+                        size={14} // Icon size
+                        color="#666" // Icon color
+                    />
                 </TouchableOpacity>
             </View>
-
-            <TouchableOpacity>
-                <Text style={styles.forgotPassword}>Forgot Password</Text>
-            </TouchableOpacity>
 
             <TouchableOpacity
                 style={styles.signInButton}
                 // onPress={() => navigation.navigate('Home')}
                 onPress={handleLogin}
-                >
+            >
                 {loading ?
                     <Text>Loading...</Text>
                     :
@@ -175,7 +178,7 @@ const styles = StyleSheet.create({
     eyeIcon: {
         position: "absolute",
         right: 10,
-        fontSize: 18,
+        fontSize: 14,
     },
     forgotPassword: {
         color: "#008080",

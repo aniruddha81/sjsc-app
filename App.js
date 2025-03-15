@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView  } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
@@ -13,6 +13,8 @@ import TakeAttendance from './screens/TakeAttendance';
 import Marks from './screens/Marks';
 import Notice from './screens/Notice';
 import Teachers from './screens/Teachers';
+import ViewAttendance from './screens/ViewAttendance';
+import Profile from './screens/Profile';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,11 +42,7 @@ export default function App() {
             <Stack.Screen
               name="Login"
               options={{
-                title: 'Login',
-                headerStyle: { backgroundColor: '#111' },
-                headerTintColor: '#fff',
-                headerTitleStyle: { fontWeight: 'bold' },
-                headerTextAlign: 'center'
+                headerShown: false
               }}
             >
               {(props) => (
@@ -109,7 +107,7 @@ export default function App() {
                 name="Notice"
                 component={Notice}
                 options={{
-                  title: 'Notice',
+                  title: 'Attendance History',
                   headerStyle: { backgroundColor: '#111' },
                   headerTintColor: '#fff',
                   headerTitleStyle: { fontWeight: 'bold' },
@@ -127,6 +125,44 @@ export default function App() {
                   headerTextAlign: 'center'
                 }}
               />
+              <Stack.Screen
+                name="ViewAttendance"
+                component={ViewAttendance}
+                options={{
+                  title: 'View Attendance',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              />
+              {/* <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{
+                  title: 'Profile',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              /> */}
+              <Stack.Screen
+                name="Profile"
+                options={{
+                  title: 'Profile',
+                  headerStyle: { backgroundColor: '#111' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerTextAlign: 'center'
+                }}
+              >
+                {(props) => (
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <Profile {...props} setValue={setValue} />
+                  </SafeAreaView>
+                )}
+              </Stack.Screen>
             </>
           )
         }

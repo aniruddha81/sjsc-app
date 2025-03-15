@@ -3,8 +3,12 @@ import { View,Text } from 'react-native';
 
 const Marks = () => {
     return (
-       <View>
-              <Text>Marks</Text>
+       <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+       }}>
+              <Text>Comming Soon...</Text>
        </View>
     );
 };
