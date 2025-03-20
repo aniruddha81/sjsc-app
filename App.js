@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
@@ -26,12 +26,28 @@ export default function App() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem("token");
-      setValue(token);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        setValue(token);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkLoginStatus();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#6C63FF" />
+      </View>
+    );
+  }
+
+
 
 
   return (
@@ -75,9 +91,8 @@ export default function App() {
                 component={Attendance}
                 options={{
                   title: 'Attendance',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               />
@@ -86,9 +101,8 @@ export default function App() {
                 component={TakeAttendance}
                 options={{
                   title: 'Attendance',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               />
@@ -97,9 +111,8 @@ export default function App() {
                 component={Marks}
                 options={{
                   title: 'Marks',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               />
@@ -108,9 +121,8 @@ export default function App() {
                 component={Notice}
                 options={{
                   title: 'Attendance History',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               />
@@ -119,9 +131,8 @@ export default function App() {
                 component={Teachers}
                 options={{
                   title: 'Teachers',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               />
@@ -130,9 +141,8 @@ export default function App() {
                 component={ViewAttendance}
                 options={{
                   title: 'View Attendance',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               />
@@ -151,15 +161,14 @@ export default function App() {
                 name="Profile"
                 options={{
                   title: 'Profile',
-                  headerStyle: { backgroundColor: '#111' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: 'bold' },
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
                   headerTextAlign: 'center'
                 }}
               >
                 {(props) => (
                   <SafeAreaView style={{ flex: 1 }}>
-                    <Profile {...props} setValue={setValue} />
+                    <Profile setValue={setValue} />
                   </SafeAreaView>
                 )}
               </Stack.Screen>

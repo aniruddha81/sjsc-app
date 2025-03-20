@@ -13,7 +13,7 @@ const Header = () => {
             <View style={{
                 flex: 1, flexDirection: "row", alignItems: "center", gap: 10
             }}>
-                <Image source={require('../assets/sjsc.png')} style={{ width: 60, height: 60 }} />
+                <Image source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }} style={{ width: 60, height: 60 }} />
                 <View>
                     <Text style={{
                         fontWeight: "bold"
@@ -29,13 +29,13 @@ const Header = () => {
             {/* Right-end Image with Text (User) */}
             <TouchableOpacity
                 onPress={() => goProfile()}
-                 style={{
-                flex: "row", alignItems: "center", justifyContent: "space-between"
-            }}>
+                style={{
+                    flex: "row", alignItems: "center", justifyContent: "space-between"
+                }}>
                 <Image source={{ uri: "https://assets.chorcha.net/ZUfPUPHLvDxY_yOveJGZm.png" }}
                     style={{ width: 30, height: 30, borderRadius: 50, }}
                 />
-               
+
             </TouchableOpacity>
         </View>
 

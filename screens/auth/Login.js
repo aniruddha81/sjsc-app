@@ -70,7 +70,7 @@ const LoginScreen = ({ setValue }) => {
     };
     return (
         <View style={styles.container}>
-            <Image source={require("../../assets/sjsc.jpeg")} style={styles.logo} />
+            <Image source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }} style={styles.logo} />
             <Text style={styles.schoolName}>St. Joseph's School and College</Text>
             <Text style={styles.signInText}>Sign In</Text>
             {error &&
@@ -100,7 +100,7 @@ const LoginScreen = ({ setValue }) => {
                     value={password}
                     onChangeText={setPassword}
                 />
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={styles.eyeIcon}
                     onPress={() => setShowPassword(!showPassword)}>
                     <Icon

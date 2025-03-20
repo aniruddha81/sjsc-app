@@ -10,8 +10,8 @@ export default function TakeAttendance() {
     const navigation = useNavigation();
 
     const route = useRoute();
-    const { classId, groupId, sectionId, className, groupName, sectionName, attendanceId } = route.params || {};
-
+    const { classId, groupId, sectionId, shift, attendanceId } = route.params || {};
+    console.log("shift", shift);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedStudents, setSelectedStudents] = useState([]);
@@ -21,10 +21,10 @@ export default function TakeAttendance() {
     const fetchStudents = async () => {
         try {
             setLoading(true);
-            if (!classId ) {
+            if (!classId) {
                 alert('Invalid classId or groupId');
             }
-            const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/students/fetch?classId=${classId}&groupId=${groupId}&sectionId=${sectionId || ''}`);
+            const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/students/fetch?classId=${classId}&groupId=${groupId || ''}&sectionId=${sectionId || ''}&shift=${shift || ''}`);
             setData(res.data);
         } catch (error) {
             console.error('Error fetching students:', error);
@@ -120,14 +120,19 @@ export default function TakeAttendance() {
                 {/* <Text style={{ fontSize: 16, fontWeight: 'bold' }}
                 >{className} | {groupName} | {sectionName || ""}  </Text> */}
                 <TouchableOpacity
-                    style={{ padding: 10, color: 'blue' }}
+                    style={{ padding: 1, color: 'blue' }}
                     onPress={ToggleselectAll}
                 >
                     <Text>{selectedStudents.length === data.length ? 'Deselect All' : 'Select All'}</Text>
                 </TouchableOpacity>
             </View>
 
-
+            {data.length === 0 && <Text style={{
+                color: 'red',
+                fontSize: 16,
+                textAlign: 'center',
+                marginTop: 20
+            }}>No students found</Text>}
             <FlatList
                 data={data}
                 keyExtractor={item => item.id.toString()}
@@ -139,9 +144,9 @@ export default function TakeAttendance() {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "start", padding: 10 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text>{item.roll}</Text>
-                                <Image source={{ uri: "https://i.ibb.co.com/zWb8jL6w/360-F-77711294-BA5-QTjtg-GPm-LKCXGdtb-Ag-Zci-L4k-Ew-Cnx.jpg" }}
+                                {/* <Image source={{ uri: "https://i.ibb.co.com/zWb8jL6w/360-F-77711294-BA5-QTjtg-GPm-LKCXGdtb-Ag-Zci-L4k-Ew-Cnx.jpg" }}
                                     style={{ width: 30, height: 30 }}
-                                />
+                                /> */}
                             </View>
                             <Text>{item.name}</Text>
                             <Text>{selectedStudents.includes(item.id) ? '✅' : '⬜'}</Text>
@@ -171,7 +176,7 @@ const styles = StyleSheet.create({
         marginBottom: 0,
     },
     dropdown: {
-        marginVertical: 8,
+        marginVertical: 4,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,

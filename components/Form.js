@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -71,6 +71,10 @@ const TeacherDropdownForm = () => {
                     value: cls.id,
                 }));
                 setClassItems(classes);
+                setShiftItems(res.data.teacher.assignedShift?.map(shift => ({
+                    label: shift,
+                    value: shift,
+                })));
             } catch (error) {
                 console.error('Error fetching teacher data:', error);
                 setLoading(false);
@@ -106,6 +110,7 @@ const TeacherDropdownForm = () => {
             setSectionValue(null);
         }
     }, [classValue, teacherData]);
+    
 
     // Update Section Items when Group is selected
     useEffect(() => {
@@ -163,6 +168,7 @@ const TeacherDropdownForm = () => {
                     classId: classValue,
                     sectionId: sectionValue || null,
                     groupId: groupValue || null,
+                    shift: shiftValue || null,
                     date,
                     remarks: "",
                 },
@@ -178,21 +184,24 @@ const TeacherDropdownForm = () => {
             if (response.data.message == "Attendance report created successfully") {
                 navigation.navigate("TakeAttendance", {
                     classId: classValue,
-                    sectionId: sectionValue,
-                    groupId: groupValue,
+                    sectionId: sectionValue || null,
+                    groupId: groupValue || null,
+                    shift: shiftValue || null,
                     attendanceId: response.data.data.id,
                 });
                 // console.log(response.data);
             } else {
-                alert(response.data.message);
-                if (response.data.id) {
-                    console.log(response.data);
+                if (response.data.id && response.data.isTaken == false) {
                     navigation.navigate("TakeAttendance", {
                         classId: classValue,
                         sectionId: sectionValue,
                         groupId: groupValue,
+                        shift: shiftValue,
                         attendanceId: response?.data?.id,
                     });
+                } else {
+                    alert(response.data.message);
+                    navigation.navigate("Home");
                 }
             }
         } catch (error) {
@@ -211,7 +220,9 @@ const TeacherDropdownForm = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <View
+            style={styles.container}
+        >
             {/* Level Dropdown */}
             <Text style={styles.label}>Level</Text>
             <DropDownPicker
@@ -224,7 +235,7 @@ const TeacherDropdownForm = () => {
                 placeholder="Select School or College"
                 style={styles.dropdown}
                 zIndex={4000}
-
+                dropDownContainerStyle={styles.dropdownContainer}
             />
 
             {schoolValue === "school" && (
@@ -240,6 +251,7 @@ const TeacherDropdownForm = () => {
                         placeholder="Select Shift"
                         style={styles.dropdown}
                         zIndex={3300}
+                        dropDownContainerStyle={styles.dropdownContainer}
                     />
                 </>
             )}
@@ -256,6 +268,7 @@ const TeacherDropdownForm = () => {
                 placeholder="Select Class"
                 style={styles.dropdown}
                 zIndex={3000}
+                dropDownContainerStyle={styles.dropdownContainer}
             />
 
             {/* Group Dropdown */}
@@ -271,6 +284,7 @@ const TeacherDropdownForm = () => {
                 style={styles.dropdown}
                 zIndex={2000}
                 disabled={!classValue}
+                dropDownContainerStyle={styles.dropdownContainer}
             />
 
             {/* Section Dropdown */}
@@ -286,17 +300,15 @@ const TeacherDropdownForm = () => {
                 style={styles.dropdown}
                 zIndex={1000}
                 disabled={!classValue}
+                dropDownContainerStyle={styles.dropdownContainer}
             />
 
             {/* Date Picker */}
             <Text style={styles.label}>Date</Text>
-            <TouchableOpacity style={{
-                padding: 10,
-                borderWidth: 1,
-                borderRadius: 5,
-                borderColor: "#ccc",
-                marginBottom: 10,
-            }} onPress={() => setShowPicker(true)}>
+            <TouchableOpacity
+                style={styles.datePicker}
+                onPress={() => setShowPicker(true)}
+            >
                 <Text style={styles.dateText}>📅 {date.toDateString()}</Text>
             </TouchableOpacity>
 
@@ -309,26 +321,34 @@ const TeacherDropdownForm = () => {
                 />
             )}
 
-            {/* Submit Btn */}
-            {classValue && groupValue && sectionValue ?
-                <Button title="Submit" onPress={takeAttendance} /> : null}
-
+            {/* Submit Button */}
+            {classValue && (groupValue || sectionValue) && (
+                <Button title="Submit" onPress={takeAttendance} />
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+        padding: 10,
     },
     label: {
-        fontSize: 16,
-        marginBottom: 10,
-        marginTop: 10,
+        fontSize: 14,
+        marginVertical: 5,
     },
     dropdown: {
-        marginBottom: 10,
+        marginBottom: 1,
+        border: 1,
+        borderColor: '#ccc',
     },
+    datePicker:{
+        padding: 10,
+        borderWidth: 1,
+        borderRadius: 5,
+        borderColor: '#ccc',
+        marginBottom: 10,
+    }
 });
 
 export default TeacherDropdownForm;

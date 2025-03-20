@@ -29,20 +29,23 @@ const Menus = [
 
 export default function HomeScreen() {
     return (
-        <View style={{
-            flex: 1,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-around',
-            padding: 20,
-            alignItems: 'center',
-
-        }}>
-            {Menus.map((menu, index) => (
-                <Card key={index} item={menu.item} icon={menu.icon} href={menu.href} />
-            ))}
+        <View>
            
+            <View style={{
+                flex: 1,
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-around',
+                padding: 20,
+                alignItems: 'center',
 
+            }}>
+                {Menus.map((menu, index) => (
+                    <Card key={index} item={menu.item} icon={menu.icon} href={menu.href} />
+                ))}
+
+
+            </View>
         </View>
     );
 };
