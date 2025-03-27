@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SJSC App",
+    "name": "SJSC ",
     "slug": "sjsc-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "https://assets.chorcha.net/rRod1C8Ev7b4im6s8k2nA.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "https://assets.chorcha.net/rRod1C8Ev7b4im6s8k2nA.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.evangel_matt.sjscapp"

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
+import { useFocusEffect } from '@react-navigation/native';
 
 const AttendanceReport = () => {
   const navigation = useNavigation();
@@ -15,31 +16,52 @@ const AttendanceReport = () => {
   const [classItems, setClassItems] = useState([]);
 
   // Fetch Attendance Data
-  useEffect(() => {
-    const fetchAttendanceData = async () => {
-      try {
-        const Tid = await AsyncStorage.getItem('teacher-id');
-        const res = await axios.get(
-          `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
-        );
+  // useEffect(() => {
+  //   const fetchAttendanceData = async () => {
+  //     try {
+  //       const Tid = await AsyncStorage.getItem('teacher-id');
+  //       const res = await axios.get(
+  //         `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
+  //       );
 
-        // Filter records where isTaken = false
-        // const filteredData = res.data.filter(record => record.isTaken === false);
+  //       // Filter records where isTaken = false
+  //       // const filteredData = res.data.filter(record => record.isTaken === false);
 
-        // Sort by date in descending order
-        const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+  //       // Sort by date in descending order
+  //       const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        setAttendanceData(sortedData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching attendance data:', error);
-        setLoading(false);
-      }
-    };
+  //       setAttendanceData(sortedData);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error('Error fetching attendance data:', error);
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchAttendanceData();
-    fetchClassItems();
-  }, []);
+  //   fetchAttendanceData();
+  //   fetchClassItems();
+  // }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchAttendanceData = async () => {
+        try {
+          const Tid = await AsyncStorage.getItem('teacher-id');
+          const res = await axios.get(
+            `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
+          );
+
+          const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          setAttendanceData(sortedData);
+        } catch (error) {
+          console.error('Error fetching attendance data:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchAttendanceData();
+    }, [])
+  );
 
   const fetchClassItems = async () => {
     try {
@@ -77,76 +99,80 @@ const AttendanceReport = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Attendance Reports</Text>
-      <FlatList
-        data={attendanceData}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "#f9f9f9",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingHorizontal: 16, // Increased padding for better spacing
-              paddingVertical: 12, // Increased padding for better spacing
-              marginVertical: 8, // Increased margin for better separation
-              borderRadius: 10,
-              borderWidth: 1, // Added border for better visual separation
-              borderColor: "#e0e0e0", // Light border color
-            }}
-          >
-            {/* Date Column */}
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.cell, { flex: 1 }]}>
-                {dayjs(item.date).format("D MMMM")}
-              </Text>
-              <Text style={{
-                color: item.isTaken ? "green" : "red",
-                fontWeight: "bold",
-              }}>
-                {item.isTaken ? "Taken" : "Not Taken"}
-              </Text>
-            </View>
-
-
-            {/* Class, Group, and Section Column */}
-            <View style={{ flex: 2, marginLeft: 16 }}>
-              <Text style={styles.cell}>{item?.Class?.name}</Text>
-              <Text style={styles.cell}>
-                {item?.Group?.name || "N/A"} ({item?.Section?.name || "N/A"})
-              </Text>
-            </View>
-
-            {/* Status Column */}
-            <TouchableOpacity
-              onPress={() =>
-                item.isTaken ? handleButtonPress(item.id) : handleTakeAttendance(item)
-              }
-              style={{ flex: 1, alignItems: "flex-end" }}
+      {attendanceData.length > 0 ? (
+        <FlatList
+          data={attendanceData}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                flexDirection: "row",
+                backgroundColor: "#f9f9f9",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 16, // Increased padding for better spacing
+                paddingVertical: 12, // Increased padding for better spacing
+                marginVertical: 8, // Increased margin for better separation
+                borderRadius: 10,
+                borderWidth: 1, // Added border for better visual separation
+                borderColor: "#e0e0e0", // Light border color
+              }}
             >
-              <Text
-                style={{
-                  ...styles.cell,
+              {/* Date Column */}
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cell, { flex: 1 }]}>
+                  {dayjs(item.date).format("D MMMM")}
+                </Text>
+                <Text style={{
                   color: item.isTaken ? "green" : "red",
                   fontWeight: "bold",
-                }}
-              >
-                {/* <Text>{item.isTaken ? "Taken" : "Not Taken"}</Text> */}
-                <Text>
-                  {item.isTaken ? <Icon
-                    name="eye"
-                    type="feather"
-                    size={18}
-                    color="#007bff"
-                  /> :
-                    "✏️"
-                  }
+                }}>
+                  {item.isTaken ? "Taken" : "Not Taken"}
                 </Text>
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
+              </View>
+
+
+              {/* Class, Group, and Section Column */}
+              <View style={{ flex: 2, marginLeft: 16 }}>
+                <Text style={styles.cell}>{item?.Class?.name}</Text>
+                <Text style={styles.cell}>
+                  {item?.Group?.name || "N/A"} ({item?.Section?.name || "N/A"})
+                </Text>
+              </View>
+
+              {/* Status Column */}
+              <TouchableOpacity
+                onPress={() =>
+                  item.isTaken ? handleButtonPress(item.id) : handleTakeAttendance(item)
+                }
+                style={{ flex: 1, alignItems: "flex-end" }}
+              >
+                <Text
+                  style={{
+                    ...styles.cell,
+                    color: item.isTaken ? "green" : "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {/* <Text>{item.isTaken ? "Taken" : "Not Taken"}</Text> */}
+                  <Text>
+                    {item.isTaken ? <Icon
+                      name="eye"
+                      type="feather"
+                      size={18}
+                      color="#007bff"
+                    /> :
+                      "✏️"
+                    }
+                  </Text>
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      ) : (
+        <Text>No attendance records found.</Text>
+      )}
     </View>
   );
 };

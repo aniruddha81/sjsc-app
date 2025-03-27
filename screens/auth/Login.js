@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
@@ -18,7 +18,8 @@ const LoginScreen = ({ setValue }) => {
     const handleLogin = async () => {
         try {
             const payload = {
-                email: username,
+                email: username.startsWith("01") ? "" : username,
+                phone: username.startsWith("01") ? username : "",
                 password,
             };
 
@@ -28,7 +29,8 @@ const LoginScreen = ({ setValue }) => {
 
             // Add timeout configuration
             const res = await axios.post(
-                "https://sjsc-backend-production.up.railway.app/api/v1/auth/teacher-login",
+                // "https://sjsc-backend-production.up.railway.app/api/v1/auth/teacher-login",
+                "https://sjsc-backend-production.up.railway.app/api/v1/api/v1/auth/teacher-login",
                 payload,
                 {
                     headers: {
@@ -71,8 +73,8 @@ const LoginScreen = ({ setValue }) => {
     return (
         <View style={styles.container}>
             <Image source={{ uri: "https://assets.chorcha.net/cD1BAToGpTCAsSyWkFRlt.png" }} style={styles.logo} />
-            <Text style={styles.schoolName}>St. Joseph's School and College</Text>
-            <Text style={styles.signInText}>Sign In</Text>
+            <Text style={styles.schoolName}>St. Joseph's School and College, Bonpara, Natore</Text>
+            <Text style={styles.signInText}>Sign in</Text>
             {error &&
                 <Text style={{
                     backgroundColor: "lightcoral",
@@ -83,7 +85,7 @@ const LoginScreen = ({ setValue }) => {
                     textAlign: "center",
                 }}>{error}</Text>
             }
-            <Text style={styles.label}>User Name *</Text>
+            <Text style={styles.label}>Email/Phone *</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Enter your user name"
@@ -117,11 +119,11 @@ const LoginScreen = ({ setValue }) => {
                 // onPress={() => navigation.navigate('Home')}
                 onPress={handleLogin}
             >
-                {loading ?
-                    <Text>Loading...</Text>
-                    :
-                    <Text style={styles.signInButtonText}>Sign In</Text>
+                {loading &&
+                    <ActivityIndicator size={20} color="white" style={{ marginRight: 10 }} />
                 }
+                <Text style={styles.signInButtonText}>Sign In</Text>
+
             </TouchableOpacity>
         </View>
     );
@@ -144,6 +146,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold",
         marginBottom: 20,
+        textAlign: "center",
+        color: "#008080",
     },
     signInText: {
         fontSize: 22,
@@ -191,6 +195,9 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 5,
         alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: 10,
     },
     signInButtonText: {
         color: "white",

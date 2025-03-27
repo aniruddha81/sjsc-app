@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     View,
     FlatList,
@@ -10,6 +10,7 @@ import {
     TextInput,
 } from "react-native";
 import { Avatar, ListItem, Icon } from "react-native-elements";
+import { useFocusEffect } from "@react-navigation/native";
 
 const fetchTeachers = async () => {
     try {
@@ -69,9 +70,17 @@ export default function App() {
         }
     };
 
-    useEffect(() => {
-        loadTeachers();
-    }, []);
+    // useEffect(() => {
+    //     loadTeachers();
+    // }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadTeachers();
+        }, [])
+    );
+
+
 
     useEffect(() => {
         // Filter teachers based on search query
@@ -109,17 +118,21 @@ export default function App() {
                     <Icon name="refresh" type="feather" color="#6C63FF" size={24} onPress={onRefresh} />
                 </View>
             ) : (
-                <FlatList
-                    data={filteredTeachers}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => <TeacherCard teacher={item} />}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#6C63FF"]} />
-                    }
-                    ListEmptyComponent={
-                        <Text style={styles.emptyText}>No teachers found.</Text>
-                    }
-                />
+                teachers.length > 0 ? (
+                    <FlatList
+                        data={filteredTeachers}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => <TeacherCard teacher={item} />}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#6C63FF"]} />
+                        }
+                        ListEmptyComponent={
+                            <Text style={styles.emptyText}>No teachers found.</Text>
+                        }
+                    />
+                ) : (
+                    <Text style={styles.emptyText}>No teachers found.</Text>
+                )
             )}
         </View>
     );

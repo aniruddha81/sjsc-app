@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     View,
     Text,
@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 const ViewAttendance = () => {
     const route = useRoute();
@@ -20,29 +21,55 @@ const ViewAttendance = () => {
     const [error, setError] = useState(null);
     console.log("Bal ", id);
 
-    useEffect(() => {
-        const fetchAttendanceData = async () => {
-            try {
-                const token = await AsyncStorage.getItem("token");
-                const response = await axios.get(
-                    `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/report/${id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                setAttendanceData(response.data);
-            } catch (error) {
-                console.error("Error fetching attendance data:", error);
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchAttendanceData = async () => {
+    //         try {
+    //             const token = await AsyncStorage.getItem("token");
+    //             const response = await axios.get(
+    //                 `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/report/${id}`,
+    //                 {
+    //                     headers: {
+    //                         Authorization: `Bearer ${token}`,
+    //                     },
+    //                 }
+    //             );
+    //             setAttendanceData(response.data);
+    //         } catch (error) {
+    //             console.error("Error fetching attendance data:", error);
+    //             setError(error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
 
-        fetchAttendanceData();
-    }, [id]);
+    //     fetchAttendanceData();
+    // }, [id]);
+
+    useFocusEffect(
+        useCallback(() => {
+            const fetchAttendanceData = async () => {
+                try {
+                    const token = await AsyncStorage.getItem("token");
+                    const response = await axios.get(
+                        `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/report/${id}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    setAttendanceData(response.data);
+                } catch (error) {
+                    console.error("Error fetching attendance data:", error);
+                    setError(error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchAttendanceData();
+        }, [id])
+    );
 
     //   const handleDelete = async () => {
     //     Alert.alert(

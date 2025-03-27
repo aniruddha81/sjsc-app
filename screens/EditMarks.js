@@ -1,0 +1,281 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+
+export default function EditMarks() {
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { classId, groupId, sectionId, shift, markId,
+        examName,
+        mcq, written, practical, quiz } = route.params || {};
+
+    // console.log('TakeMarks', route.params);
+    console.log(markId);
+
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [marks, setMarks] = useState({});
+    const [processing, setProcessing] = useState(false);
+
+    useEffect(() => {
+        fetchStudents();
+    }, []);
+
+    const fetchStudents = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get(
+                `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks?marksId=${markId}`,
+                // `https://sjsc-backend-production.up.railway.app/api/v1/marks?markId=${markId}`
+            );
+            // console.log(res.data.marksReport.Marks);
+            const students = res.data.marksReport.Marks;
+
+            // Initialize marks state with existing values
+            const initialMarks = {};
+            students.forEach(student => {
+                initialMarks[student?.Student?.id] = {
+                    mcq: student.mcq || '',
+                    written: student.written || '',
+                    practical: student.practical || '',
+                    quiz: student.quiz || ''
+                };
+            });
+
+            console.log(initialMarks);
+
+            setData(students);
+            setMarks(initialMarks);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching students:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleInputChange = async (studentId, field, value) => {
+        if (value > 100) {
+            alert('Marks cannot be greater than 30');
+            return;
+        }
+
+        // Just update this specific field
+        setMarks(prevMarks => ({
+            ...prevMarks,
+            [studentId]: {
+                ...prevMarks[studentId],
+                [field]: value,
+            },
+        }));
+
+        try {
+            const rs = await axios.put(`https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/update-marks/${markId}`, {
+                studentId: studentId,
+                [field]: value,
+            });
+            if (rs.data.status == "success") {
+                console.log('Marks Updated');
+            } else {
+                alert("Error updating marks");
+            }
+
+        } catch (e) {
+            console.log(e);
+            alert("Error updating marks, Please Contact Admin");
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            setProcessing(true);
+            const studentRecords = data.map(student => ({
+                studentId: student.Student?.id,
+                mcq: parseInt(marks[student.Student.id]?.mcq) || null,
+                written: parseInt(marks[student.Student.id]?.written) || null,
+                practical: parseInt(marks[student.Student.id]?.practical) || null,
+                quiz: parseInt(marks[student.Student.id]?.quiz) || null,
+            }));
+
+            console.log(studentRecords);
+
+            // const response = await axios.post(
+            //     `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/take-marks`,
+            //     // 'https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks',
+            //     {
+            //         marksId: markId,
+            //         records: studentRecords,
+            //     },
+            //     {
+            //         headers: { Authorization: `Bearer ${token}` },
+            //     }
+            // );
+
+            // if (response.status === 200) {
+            //     alert('Marks recorded successfully!');
+            //     // navigation.navigate('ViewAttendance', { id: attendanceId });
+            // } else {
+            //     alert('Unexpected response from the server');
+            // }
+            setProcessing(false);
+        } catch (error) {
+            console.log(error);
+            alert(error.response?.data?.message || 'An error occurred');
+            setProcessing(false);
+        }
+    };
+
+    if (loading || !data) {
+        return (
+            <View style={styles.center}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
+
+    // console.log(marks["1775"].quiz);
+
+    return (
+
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}>
+            <ScrollView
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                removeClippedSubviews={true}
+                scrollEventThrottle={16}
+                contentContainerStyle={styles.scrollView}>
+                <View style={styles.container}>
+                    {data.length === 0 && <Text style={styles.noStudentsText}>No students found</Text>}
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        marginBottom: 20,
+                    }}>
+                        Edit - {examName}
+                    </Text>
+                    {data.map(item => (
+                        <View key={item.Student.id} style={styles.studentCard}>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 10,
+                                marginBottom: 10,
+                            }}>
+                                <Text style={styles.studentRoll }>{item?.Student?.roll} - {item?.Student?.name}</Text>
+                                {quiz && (
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Quiz"
+                                        keyboardType="numeric"
+                                        value={String(marks[item.Student?.id]?.quiz || '')}
+                                        onChangeText={text => handleInputChange(item.Student?.id, 'quiz', text)}
+                                    />
+                                )}
+                            </View>
+                            <View style={styles.marksRow}>
+                                {mcq && (
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="MCQ"
+                                        keyboardType="numeric"
+                                        value={String(marks[item.Student.id]?.mcq)}
+                                        onChangeText={text => handleInputChange(item.Student.id, 'mcq', text)}
+                                    />
+                                )}
+                                {written && (
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Written"
+                                        keyboardType="numeric"
+                                        value={String(marks[item.Student.id].written)}
+                                        onChangeText={text => handleInputChange(item.Student.id, 'written', text)}
+                                    />
+                                )}
+                                {practical && (
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Practical"
+                                        keyboardType="numeric"
+                                        value={String(marks[item.Student.id]?.practical)}
+                                        onChangeText={text => handleInputChange(item.Student.id, 'practical', text)}
+                                    />
+                                )}
+
+                            </View>
+                        </View>
+                    ))}
+
+                    {/* <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={processing}>
+                {processing ? <ActivityIndicator color="white" /> : null}
+                <Text style={styles.submitButtonText}>Submit Marks</Text>
+            </TouchableOpacity> */}
+                </View>
+
+            </ScrollView>
+
+            {/* <View style={{ paddingBottom: 100 }} /> */}
+        </KeyboardAvoidingView>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    noStudentsText: {
+        color: 'red',
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 20,
+    },
+    studentCard: {
+        marginVertical: 10,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+    },
+    studentRoll: {
+        fontWeight: 'bold',
+        fontSize: 12,
+        marginBottom: 8,
+        width: '70%',
+    },
+    marksRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    input: {
+        flex: 1,
+        marginHorizontal: 5,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 5,
+        textAlign: 'center',
+    },
+    submitButton: {
+        padding: 15,
+        backgroundColor: 'green',
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    submitButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 18,
+    },
+    scrollView: {
+        paddingBottom: 200,
+    },
+});
+

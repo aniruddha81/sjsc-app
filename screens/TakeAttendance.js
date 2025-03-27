@@ -156,7 +156,7 @@ export default function TakeAttendance() {
             />
 
             <TouchableOpacity
-                style={{ padding: 10, backgroundColor: 'green', borderRadius: 5, marginTop: 10 }}
+                style={styles.submitButton}
                 onPress={() => handleSubmit()}
             >
                 {proccessing ? <ActivityIndicator color="white" /> : null}
@@ -192,5 +192,20 @@ const styles = StyleSheet.create({
     error: {
         color: 'red',
         fontSize: 16
-    }
+    },
+    submitButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10,
+        padding: 10,
+        backgroundColor: 'green',
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    submitButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 18,
+    },
 });

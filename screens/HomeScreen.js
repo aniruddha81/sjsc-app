@@ -25,6 +25,11 @@ const Menus = [
         icon: 'people',
         href: 'Teachers',
     },
+    {
+        item: 'Marks History',
+        icon: 'edit',
+        href: 'MarksList',
+    },
 ];
 
 export default function HomeScreen() {

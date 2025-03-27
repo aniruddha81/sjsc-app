@@ -15,6 +15,9 @@ import Notice from './screens/Notice';
 import Teachers from './screens/Teachers';
 import ViewAttendance from './screens/ViewAttendance';
 import Profile from './screens/Profile';
+import TakeMarks from './screens/TakeMarks';
+import EditMarks from './screens/EditMarks';
+import MarksList from './screens/MarksList';
 
 const Stack = createNativeStackNavigator();
 
@@ -141,6 +144,36 @@ export default function App() {
                 component={ViewAttendance}
                 options={{
                   title: 'View Attendance',
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="TakeMarks"
+                component={TakeMarks}
+                options={{
+                  title: 'Put Marks',
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="EditMarks"
+                component={EditMarks}
+                options={{
+                  title: 'Edit Marks',
+                  headerStyle: { backgroundColor: '#eee' },
+                  headerTintColor: '#111',
+                  headerTextAlign: 'center'
+                }}
+              />
+              <Stack.Screen
+                name="MarksList"
+                component={MarksList}
+                options={{
+                  title: 'Marks List',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
                   headerTextAlign: 'center'

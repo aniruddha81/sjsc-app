@@ -54,6 +54,8 @@ const TeacherDropdownForm = () => {
     const [sectionValue, setSectionValue] = useState(null);
     const [sectionItems, setSectionItems] = useState([]);
 
+    const [submitting, setSubmitting] = useState(false);
+
     // Fetch Teacher Data
     useEffect(() => {
         const fetchTeacherData = async () => {
@@ -110,7 +112,7 @@ const TeacherDropdownForm = () => {
             setSectionValue(null);
         }
     }, [classValue, teacherData]);
-    
+
 
     // Update Section Items when Group is selected
     useEffect(() => {
@@ -160,6 +162,8 @@ const TeacherDropdownForm = () => {
                 groupValue,
             )
 
+            setSubmitting(true);
+
             const response = await axios.post(
                 // `http://192.168.0.101:3000/api/v1/attendance/create/report`,
                 `https://sjsc-backend-production.up.railway.app/api/v1/attendance/create/report`,
@@ -180,7 +184,7 @@ const TeacherDropdownForm = () => {
                 }
             );
 
-
+            setSubmitting(false);
             if (response.data.message == "Attendance report created successfully") {
                 navigation.navigate("TakeAttendance", {
                     classId: classValue,
@@ -220,112 +224,117 @@ const TeacherDropdownForm = () => {
     }
 
     return (
-        <View
-            style={styles.container}
-        >
-            {/* Level Dropdown */}
-            <Text style={styles.label}>Level</Text>
-            <DropDownPicker
-                open={openSchool}
-                value={schoolValue}
-                items={schoolItems}
-                setOpen={setOpenSchool}
-                setValue={setSchoolValue}
-                setItems={setSchoolItems}
-                placeholder="Select School or College"
-                style={styles.dropdown}
-                zIndex={4000}
-                dropDownContainerStyle={styles.dropdownContainer}
-            />
-
-            {schoolValue === "school" && (
-                <>
-                    <Text style={styles.label}>Shift</Text>
-                    <DropDownPicker
-                        open={openShift}
-                        value={shiftValue}
-                        items={shiftItems}
-                        setOpen={setOpenShift}
-                        setValue={setShiftValue}
-                        setItems={setShiftItems}
-                        placeholder="Select Shift"
-                        style={styles.dropdown}
-                        zIndex={3300}
-                        dropDownContainerStyle={styles.dropdownContainer}
-                    />
-                </>
-            )}
-
-            {/* Class Dropdown */}
-            <Text style={styles.label}>Class</Text>
-            <DropDownPicker
-                open={openClass}
-                value={classValue}
-                items={classItems}
-                setOpen={setOpenClass}
-                setValue={setClassValue}
-                setItems={setClassItems}
-                placeholder="Select Class"
-                style={styles.dropdown}
-                zIndex={3000}
-                dropDownContainerStyle={styles.dropdownContainer}
-            />
-
-            {/* Group Dropdown */}
-            <Text style={styles.label}>Group</Text>
-            <DropDownPicker
-                open={openGroup}
-                value={groupValue}
-                items={groupItems}
-                setOpen={setOpenGroup}
-                setValue={setGroupValue}
-                setItems={setGroupItems}
-                placeholder="Select Group"
-                style={styles.dropdown}
-                zIndex={2000}
-                disabled={!classValue}
-                dropDownContainerStyle={styles.dropdownContainer}
-            />
-
-            {/* Section Dropdown */}
-            <Text style={styles.label}>Section</Text>
-            <DropDownPicker
-                open={openSection}
-                value={sectionValue}
-                items={sectionItems}
-                setOpen={setOpenSection}
-                setValue={setSectionValue}
-                setItems={setSectionItems}
-                placeholder="Select Section"
-                style={styles.dropdown}
-                zIndex={1000}
-                disabled={!classValue}
-                dropDownContainerStyle={styles.dropdownContainer}
-            />
-
-            {/* Date Picker */}
-            <Text style={styles.label}>Date</Text>
-            <TouchableOpacity
-                style={styles.datePicker}
-                onPress={() => setShowPicker(true)}
+        <ScrollView>
+            <View
+                style={styles.container}
             >
-                <Text style={styles.dateText}>📅 {date.toDateString()}</Text>
-            </TouchableOpacity>
-
-            {showPicker && (
-                <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={onChange}
+                {/* Level Dropdown */}
+                <Text style={styles.label}>Level</Text>
+                <DropDownPicker
+                    open={openSchool}
+                    value={schoolValue}
+                    items={schoolItems}
+                    setOpen={setOpenSchool}
+                    setValue={setSchoolValue}
+                    setItems={setSchoolItems}
+                    placeholder="Select School or College"
+                    style={styles.dropdown}
+                    zIndex={4000}
+                    dropDownContainerStyle={styles.dropdownContainer}
                 />
-            )}
 
-            {/* Submit Button */}
-            {classValue && (groupValue || sectionValue) && (
-                <Button title="Submit" onPress={takeAttendance} />
-            )}
-        </View>
+                {schoolValue === "school" && (
+                    <>
+                        <Text style={styles.label}>Shift</Text>
+                        <DropDownPicker
+                            open={openShift}
+                            value={shiftValue}
+                            items={shiftItems}
+                            setOpen={setOpenShift}
+                            setValue={setShiftValue}
+                            setItems={setShiftItems}
+                            placeholder="Select Shift"
+                            style={styles.dropdown}
+                            zIndex={3300}
+                            dropDownContainerStyle={styles.dropdownContainer}
+                        />
+                    </>
+                )}
+
+                {/* Class Dropdown */}
+                <Text style={styles.label}>Class</Text>
+                <DropDownPicker
+                    open={openClass}
+                    value={classValue}
+                    items={classItems}
+                    setOpen={setOpenClass}
+                    setValue={setClassValue}
+                    setItems={setClassItems}
+                    placeholder="Select Class"
+                    style={styles.dropdown}
+                    zIndex={3000}
+                    dropDownContainerStyle={styles.dropdownContainer}
+                />
+
+                {/* Group Dropdown */}
+                <Text style={styles.label}>Group</Text>
+                <DropDownPicker
+                    open={openGroup}
+                    value={groupValue}
+                    items={groupItems}
+                    setOpen={setOpenGroup}
+                    setValue={setGroupValue}
+                    setItems={setGroupItems}
+                    placeholder="Select Group"
+                    style={styles.dropdown}
+                    zIndex={2000}
+                    disabled={!classValue}
+                    dropDownContainerStyle={styles.dropdownContainer}
+                />
+
+                {/* Section Dropdown */}
+                <Text style={styles.label}>Section</Text>
+                <DropDownPicker
+                    open={openSection}
+                    value={sectionValue}
+                    items={sectionItems}
+                    setOpen={setOpenSection}
+                    setValue={setSectionValue}
+                    setItems={setSectionItems}
+                    placeholder="Select Section"
+                    style={styles.dropdown}
+                    zIndex={1000}
+                    disabled={!classValue}
+                    dropDownContainerStyle={styles.dropdownContainer}
+                />
+
+                {/* Date Picker */}
+                <Text style={styles.label}>Date</Text>
+                <TouchableOpacity
+                    style={styles.datePicker}
+                    onPress={() => setShowPicker(true)}
+                >
+                    <Text style={styles.dateText}>📅 {date.toDateString()}</Text>
+                </TouchableOpacity>
+
+                {showPicker && (
+                    <DateTimePicker
+                        value={date}
+                        mode="date"
+                        display="default"
+                        onChange={onChange}
+                    />
+                )}
+
+                {/* Submit Button */}
+                {classValue && (groupValue || sectionValue) && (
+                    <TouchableOpacity style={styles.submitButton} onPress={takeAttendance} disabled={submitting}>
+                        {submitting ? <ActivityIndicator color="white" /> : null}
+                        <Text style={styles.submitButtonText}>Submit</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </ScrollView>
     );
 };
 
@@ -342,13 +351,28 @@ const styles = StyleSheet.create({
         border: 1,
         borderColor: '#ccc',
     },
-    datePicker:{
+    datePicker: {
         padding: 10,
         borderWidth: 1,
         borderRadius: 5,
         borderColor: '#ccc',
         marginBottom: 10,
-    }
+    },
+    submitButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10,
+        padding: 10,
+        backgroundColor: 'green',
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    submitButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 18,
+    },
 });
 
 export default TeacherDropdownForm;
