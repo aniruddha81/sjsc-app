@@ -63,7 +63,7 @@ export default function TakeMarks() {
             }));
 
             const response = await axios.post(
-                `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/take-marks`,
+                `https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks`,
                 // 'https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks',
                 {
                     marksId: markId,

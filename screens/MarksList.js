@@ -22,7 +22,7 @@ const MarksList = () => {
                 try {
                     const Tid = await AsyncStorage.getItem('teacher-id');
                     const res = await axios.get(
-                        `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/all-reports?teacherId=${Tid}`
+                        `https://sjsc-backend-production.up.railway.app/api/v1/marks/all-reports?teacherId=${Tid}`
                     );
 
                     setAttendanceData(res.data.marksReport);

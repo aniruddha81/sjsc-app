@@ -27,7 +27,7 @@ export default function EditMarks() {
         try {
             setLoading(true);
             const res = await axios.get(
-                `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks?marksId=${markId}`,
+                `https://sjsc-backend-production.up.railway.app/api/v1/marks?marksId=${markId}`,
                 // `https://sjsc-backend-production.up.railway.app/api/v1/marks?markId=${markId}`
             );
             // console.log(res.data.marksReport.Marks);
@@ -72,7 +72,7 @@ export default function EditMarks() {
         }));
 
         try {
-            const rs = await axios.put(`https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/update-marks/${markId}`, {
+            const rs = await axios.put(`https://sjsc-backend-production.up.railway.app/api/v1/marks/update-marks/${markId}`, {
                 studentId: studentId,
                 [field]: value,
             });

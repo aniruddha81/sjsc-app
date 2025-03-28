@@ -162,7 +162,7 @@ const Marks = () => {
 
             setSubmitting(true);
             const response = await axios.post(
-                `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/create-report`,
+                `https://sjsc-backend-production.up.railway.app/api/v1/marks/create-report`,
                 // `https://sjsc-backend-production.up.railway.app/api/v1/marks/create-report`,
                 { ...payload },
                 {
@@ -212,7 +212,7 @@ const Marks = () => {
         } catch (error) {
             if (error.response) {
                 alert(error.response.data.message);
-                console.log("Error response:", error.response.data.message);
+                console.log("Error response:", error.response);
 
             } else {
                 console.error("Error message:", error.message);
