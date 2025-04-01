@@ -1,27 +1,27 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ScrollView, ActivityIndicator, Text, StyleSheet, View, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 
 export default function EditMarks() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { classId, groupId, sectionId, shift, markId,
-        examName,
+    const { className,sectionName, groupName, examName,
+        groupId, sectionId, shift, markId,
         mcq, written, practical, quiz } = route.params || {};
 
-    // console.log('TakeMarks', route.params);
-    console.log(markId);
-
+    console.log(className,sectionName, groupName, examName)
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [marks, setMarks] = useState({});
     const [processing, setProcessing] = useState(false);
 
-    useEffect(() => {
-        fetchStudents();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchStudents();
+        }, [])
+    );
 
     const fetchStudents = async () => {
         try {
@@ -88,45 +88,6 @@ export default function EditMarks() {
         }
     };
 
-    const handleSubmit = async () => {
-        try {
-            const token = await AsyncStorage.getItem('token');
-            setProcessing(true);
-            const studentRecords = data.map(student => ({
-                studentId: student.Student?.id,
-                mcq: parseInt(marks[student.Student.id]?.mcq) || null,
-                written: parseInt(marks[student.Student.id]?.written) || null,
-                practical: parseInt(marks[student.Student.id]?.practical) || null,
-                quiz: parseInt(marks[student.Student.id]?.quiz) || null,
-            }));
-
-            console.log(studentRecords);
-
-            // const response = await axios.post(
-            //     `https://sjsc-backend-production.up.railway.app/api/v1/api/v1/marks/take-marks`,
-            //     // 'https://sjsc-backend-production.up.railway.app/api/v1/marks/take-marks',
-            //     {
-            //         marksId: markId,
-            //         records: studentRecords,
-            //     },
-            //     {
-            //         headers: { Authorization: `Bearer ${token}` },
-            //     }
-            // );
-
-            // if (response.status === 200) {
-            //     alert('Marks recorded successfully!');
-            //     // navigation.navigate('ViewAttendance', { id: attendanceId });
-            // } else {
-            //     alert('Unexpected response from the server');
-            // }
-            setProcessing(false);
-        } catch (error) {
-            console.log(error);
-            alert(error.response?.data?.message || 'An error occurred');
-            setProcessing(false);
-        }
-    };
 
     if (loading || !data) {
         return (
@@ -144,20 +105,20 @@ export default function EditMarks() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1 }}>
             <ScrollView
-                keyboardShouldPersistTaps="handled"
-                keyboardDismissMode="on-drag"
-                removeClippedSubviews={true}
+                // keyboardShouldPersistTaps="handled"
+                // keyboardDismissMode="on-drag"
+                // removeClippedSubviews={true}
                 scrollEventThrottle={16}
                 contentContainerStyle={styles.scrollView}>
                 <View style={styles.container}>
                     {data.length === 0 && <Text style={styles.noStudentsText}>No students found</Text>}
                     <Text style={{
                         fontSize: 16,
-                        fontWeight: 'bold',
+                        fontWeight: 'semibold',
                         textAlign: 'center',
                         marginBottom: 20,
                     }}>
-                        Edit - {examName}
+                        {examName} ({className} {groupName || ""} - {sectionName || ""}) {shift ? `(${shift})` : ""}
                     </Text>
                     {data.map(item => (
                         <View key={item.Student.id} style={styles.studentCard}>

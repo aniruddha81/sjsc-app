@@ -19,7 +19,7 @@ const ViewAttendance = () => {
     const [attendanceData, setAttendanceData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    console.log("Bal ", id);
+
 
     // useEffect(() => {
     //     const fetchAttendanceData = async () => {
@@ -60,8 +60,19 @@ const ViewAttendance = () => {
                     );
                     setAttendanceData(response.data);
                 } catch (error) {
-                    console.error("Error fetching attendance data:", error);
-                    setError(error);
+
+                    if (axios.isAxiosError(error)) {
+                        if (error.response) {
+                            setError("An unexpected error occurred");
+                        } else if (error.request) {
+                            setError("Network error - please check your connection");
+                        } else {
+                            setError("An unexpected error occurred");
+                        }
+                    } else {
+                        // setError(error);
+                        console.log(error);
+                    }
                 } finally {
                     setLoading(false);
                 }
@@ -71,46 +82,6 @@ const ViewAttendance = () => {
         }, [id])
     );
 
-    //   const handleDelete = async () => {
-    //     Alert.alert(
-    //       "Are you sure?",
-    //       "You won't be able to revert this!",
-    //       [
-    //         {
-    //           text: "Cancel",
-    //           style: "cancel",
-    //         },
-    //         {
-    //           text: "Yes, delete it!",
-    //           onPress: async () => {
-    //             try {
-    //               await axios.delete(
-    //                 `https://sjsc-backend-production.up.railway.app/api/v1/attendance/delete/report/${id}`,
-    //                 {
-    //                   data: { id },
-    //                   headers: {
-    //                     Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-    //                   },
-    //                 }
-    //               );
-    //               Toast.show({
-    //                 type: "success",
-    //                 text1: "Attendance report deleted successfully",
-    //               });
-    //               navigation.navigate("CreateAttendance");
-    //             } catch (error) {
-    //               console.error("Error deleting attendance report:", error);
-    //               Toast.show({
-    //                 type: "error",
-    //                 text1: "Failed to delete attendance report",
-    //               });
-    //             }
-    //           },
-    //         },
-    //       ],
-    //       { cancelable: false }
-    //     );
-    //   };
 
     const totalStudent = attendanceData?.Attendances.length;
 
@@ -120,16 +91,67 @@ const ViewAttendance = () => {
     if (error) return <Text>Error: {error.message}</Text>;
 
     return (
+        // <ScrollView style={styles.container}>
+        //     {/* Attendance Information Section */}
+        //     <View style={styles.section}>
+        //         <Text style={styles.sectionHeader}>Attendance Information</Text>
+        //         <View style={styles.grid}>
+        //             {[
+        //                 {
+        //                     label: "Date",
+        //                     value: new Date(attendanceData.date).toLocaleDateString(),
+        //                 },
+        //                 { label: "Teacher", value: attendanceData?.Teacher?.name },
+        //                 { label: "Class", value: attendanceData?.Class?.name },
+        //                 { label: "Group", value: attendanceData?.Group?.name },
+        //                 { label: "Section", value: attendanceData?.Section?.name },
+        //                 { label: "Total Student", value: totalStudent },
+        //                 { label: "Total Present", value: attendanceData.totalPresent },
+        //                 { label: "Total Absent", value: attendanceData.totalAbsent },
+        //                 { label: "Remarks", value: attendanceData.remarks || "N/A" },
+        //             ].map((item, index) => (
+        //                 <View key={index} style={styles.gridItem}>
+        //                     <Text style={styles.label}>{item.label}</Text>
+        //                     <Text style={styles.value}>{item.value}</Text>
+        //                 </View>
+        //             ))}
+        //         </View>
+        //     </View>
+
+        //     {/* Attendance Report Table Section */}
+        //     <View style={styles.section}>
+        //         <Text style={styles.sectionHeader}>Attendance Report</Text>
+        //         <FlatList
+        //             data={attendanceData.Attendances}
+        //             keyExtractor={(item) => item.id.toString()}
+        //             scrollEnabled={false} // Disable scrolling in FlatList
+        //             renderItem={({ item }) => (
+        //                 <View style={styles.row}>
+        //                     <View style={{ width: "70%" }}>
+        //                         <Text style={styles.cell}>{item.Student.roll}. {item.Student.name}</Text>
+        //                     </View>
+        //                     <View
+        //                         style={[
+        //                             styles.status,
+        //                             item.status === "Present"
+        //                                 ? styles.statusPresent
+        //                                 : styles.statusAbsent,
+        //                         ]}
+        //                     >
+        //                         <Text style={styles.statusText}>{item.status}</Text>
+        //                     </View>
+        //                 </View>
+        //             )}
+        //         />
+        //     </View>
+        // </ScrollView>
         <ScrollView style={styles.container}>
             {/* Attendance Information Section */}
             <View style={styles.section}>
                 <Text style={styles.sectionHeader}>Attendance Information</Text>
                 <View style={styles.grid}>
                     {[
-                        {
-                            label: "Date",
-                            value: new Date(attendanceData.date).toLocaleDateString(),
-                        },
+                        { label: "Date", value: new Date(attendanceData.date).toLocaleDateString() },
                         { label: "Teacher", value: attendanceData?.Teacher?.name },
                         { label: "Class", value: attendanceData?.Class?.name },
                         { label: "Group", value: attendanceData?.Group?.name },
@@ -150,30 +172,26 @@ const ViewAttendance = () => {
             {/* Attendance Report Table Section */}
             <View style={styles.section}>
                 <Text style={styles.sectionHeader}>Attendance Report</Text>
-                <FlatList
-                    data={attendanceData.Attendances}
-                    keyExtractor={(item) => item.id.toString()}
-                    scrollEnabled={false} // Disable scrolling in FlatList
-                    renderItem={({ item }) => (
-                        <View style={styles.row}>
+                <View>
+                    {attendanceData.Attendances?.map((item, index) => (
+                        <View key={index} style={styles.row}>
                             <View style={{ width: "70%" }}>
                                 <Text style={styles.cell}>{item.Student.roll}. {item.Student.name}</Text>
                             </View>
                             <View
                                 style={[
                                     styles.status,
-                                    item.status === "Present"
-                                        ? styles.statusPresent
-                                        : styles.statusAbsent,
+                                    item.status === "Present" ? styles.statusPresent : styles.statusAbsent,
                                 ]}
                             >
                                 <Text style={styles.statusText}>{item.status}</Text>
                             </View>
                         </View>
-                    )}
-                />
+                    ))}
+                </View>
             </View>
         </ScrollView>
+
     );
 };
 

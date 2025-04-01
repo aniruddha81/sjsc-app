@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const UpdateProfileForm = ({ setValue }) => {
     const navigation = useNavigation();
@@ -12,6 +13,22 @@ const UpdateProfileForm = ({ setValue }) => {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
+    const [dept, setDept] = useState("");
+
+    const [image, setImage] = useState(null);
+    const [file, setFile] = useState(null);
+
+    const [positionItems, setPositionItems] = useState([
+        { label: "Lecturer", value: "Lecturer" },
+        { label: "Assistant Professor", value: "Assistant Professor" },
+        { label: "Professor", value: "Professor" }
+    ]);
+    const [positionValue, setPositionValue] = useState(null);
+    const [openPosition, setOpenPosition] = useState(false);
+
+    const [imageUri, setImageUri] = useState(null);
+
+
 
     const getTeacher = async () => {
         try {
@@ -25,11 +42,13 @@ const UpdateProfileForm = ({ setValue }) => {
             });
 
             if (response.status === 200) {
-                const { name, email, phone, password } = response.data.teacher;
+                const { name, email, phone, password, extra } = response.data.teacher;
                 setName(name);
                 setEmail(email);
                 setPhone(phone);
-                setPassword(password)
+                setPassword(password);
+                setDept(extra?.dept || "");
+                setPositionValue(extra?.position || "");
             }
         } catch (error) {
             console.error("Error fetching teacher data:", error);
@@ -53,13 +72,16 @@ const UpdateProfileForm = ({ setValue }) => {
             name,
             email,
             phone,
-            password
+            password,
+            dept,
+            position: positionValue,
         };
 
         try {
             const teacher_id = await AsyncStorage.getItem('teacher-id');
             const token = await AsyncStorage.getItem('token');
             const response = await axios.put(
+                // `http://192.168.0.103:4000/api/v1/teachers/update-info/${teacher_id}`,
                 `https://sjsc-backend-production.up.railway.app/api/v1/teachers/update-info/${teacher_id}`,
                 data,
                 {
@@ -72,17 +94,51 @@ const UpdateProfileForm = ({ setValue }) => {
 
             if (response.status === 200) {
                 alert("Profile updated successfully");
-                navigation.goBack(); // Navigate back after successful update
+                navigation.goBack();
             }
         } catch (error) {
             console.error("Error updating profile:", error);
+
             alert("An error occurred. Please try again.");
         }
     };
+    
+    const [permissionStatus, setPermissionStatus] = useState(null);
+
+    // Requesting permissions
+    useEffect(() => {
+        const requestPermission = async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            setPermissionStatus(status === 'granted');
+        };
+        requestPermission();
+    }, []);
+
+    const pickImage = async () => {
+        if (permissionStatus === 'granted') {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
+
+            if (!result.cancelled) {
+                setImage(result.uri);
+            }
+        } else {
+            alert("Permission to access media library is required.");
+        }
+    };
+
 
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.header}>Update Profile</Text>
+            {/* <View style={styles.container}>
+                <Button title="Pick an image from camera roll" onPress={pickImage} />
+                {image && <Image source={{ uri: image }} style={styles.image} />}
+            </View> */}
 
             {/* Name Field */}
             <View style={styles.inputContainer}>
@@ -121,13 +177,29 @@ const UpdateProfileForm = ({ setValue }) => {
 
             {/* Password Field */}
             <View style={styles.inputContainer}>
-                <Text style={styles.label}>Password</Text>
+                <Text style={styles.label}>Position</Text>
+                {/* DropDown with lecturer, Asistant Prof. , Prof. */}
+                <DropDownPicker
+                    open={openPosition}
+                    value={positionValue}
+                    items={positionItems}
+                    setOpen={setOpenPosition}
+                    setValue={setPositionValue}
+                    setItems={setPositionItems}
+                    placeholder="Select your position"
+                    style={{ backgroundColor: "#fff" }}
+                    dropDownContainerStyle={{ backgroundColor: "#fff" }}
+                />
+
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Depertment</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter your Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    keyboardType="phone-pad"
+                    placeholder="Ex. Physics"
+                    value={dept}
+                    onChangeText={setDept}
                 />
             </View>
 
@@ -146,6 +218,7 @@ const UpdateProfileForm = ({ setValue }) => {
                 }}>
                 <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
+            <View style={{ height: 100 }}></View>
         </ScrollView>
     );
 };

@@ -29,8 +29,8 @@ const LoginScreen = ({ setValue }) => {
 
             // Add timeout configuration
             const res = await axios.post(
-                // "https://sjsc-backend-production.up.railway.app/api/v1/auth/teacher-login",
-                "https://sjsc-backend-production.up.railway.app/api/v1/api/v1/auth/teacher-login",
+                "https://sjsc-backend-production.up.railway.app/api/v1/auth/teacher-login",
+                // "http://192.168.0.103:3000/api/v1/auth/teacher-login",
                 payload,
                 {
                     headers: {
@@ -57,6 +57,7 @@ const LoginScreen = ({ setValue }) => {
                     if (error.response.status === 401) {
                         setError("Invalid username or password");
                     } else {
+                        console.log(error);
                         setError(`Server error: ${error.response.status}`);
                     }
                 } else if (error.request) {

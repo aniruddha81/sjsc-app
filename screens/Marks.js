@@ -54,12 +54,18 @@ const Marks = () => {
     const [examValue, setExamValue] = useState(null);
     const [examItems, setExamItems] = useState([]);
 
+    // State for Subjects Dropdown
+    const [openSubject, setOpenSubject] = useState(false);
+    const [subjectValue, setSubjectValue] = useState(null);
+    const [subjectItems, setSubjectItems] = useState([]);
+
     // Fetch Teacher Data
     useEffect(() => {
         const fetchTeacherData = async () => {
             try {
                 const Tid = await AsyncStorage.getItem('teacher-id');
                 const res = await axios.get(
+                    // `http://192.168.0.103:3000/api/v1/teachers/fetch/${Tid}`
                     `https://sjsc-backend-production.up.railway.app/api/v1/teachers/fetch/${Tid}`
                 );
                 setTeacherData(res.data.teacher);
@@ -68,6 +74,7 @@ const Marks = () => {
                 // Set Class Items
                 const classes = res.data.teacher.assignedClasses?.map(cls => ({
                     label: cls.name,
+                    level: cls.level,
                     value: cls.id,
                 }));
                 setClassItems(classes);
@@ -75,6 +82,13 @@ const Marks = () => {
                     label: shift,
                     value: shift,
                 })));
+                setSubjectItems(res.data.teacher.assignedSubjects?.map(subject => ({
+                    label: `${subject.name} (${subject.Class.level == "College" ? "college" : subject.Class.level})`,
+                    class: subject.Class.id,
+                    level: subject.Class.level,
+                    value: subject.id,
+                })));
+
             } catch (error) {
                 console.error('Error fetching teacher data:', error);
                 setLoading(false);
@@ -84,9 +98,10 @@ const Marks = () => {
         const fetchExams = async () => {
             try {
                 const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/exam`);
-                console.log(res.data.exams);
+                // console.log(res.data.exams);
                 setExamItems(res.data.exams.map(exam => ({
                     label: exam.name,
+                    classId: exam.Class.id,
                     mcq: exam.mcq,
                     written: exam.written,
                     practical: exam.practical,
@@ -144,6 +159,9 @@ const Marks = () => {
         }
     }, [classValue, teacherData]);
 
+    useEffect(() => {
+        setShiftValue(null);
+    }, [schoolValue]);
 
     const TakeMarks = async () => {
         try {
@@ -155,7 +173,8 @@ const Marks = () => {
                 groupId: groupValue || null,
                 sectionId: sectionValue || null,
                 examId: examValue || null,
-                subjectId: teacherData?.Subject?.id || null,
+                subjectId: subjectValue || null,
+                shift: shiftValue || null,
             };
 
             // console.log(payload);
@@ -163,7 +182,7 @@ const Marks = () => {
             setSubmitting(true);
             const response = await axios.post(
                 `https://sjsc-backend-production.up.railway.app/api/v1/marks/create-report`,
-                // `https://sjsc-backend-production.up.railway.app/api/v1/marks/create-report`,
+                // `http://192.168.0.103:3000/api/v1/marks/create-report`,
                 { ...payload },
                 {
                     headers: {
@@ -183,7 +202,7 @@ const Marks = () => {
                     examId: examValue || null,
                     examName: examItems.find(exam => exam.value === examValue).label,
                     teacherId: parseInt(Tid),
-                    subjectId: teacherData?.Subject?.id,
+                    subjectId: subjectValue || null,
                     mcq: examItems.find(exam => exam.value === examValue).mcq,
                     written: examItems.find(exam => exam.value === examValue).written,
                     practical: examItems.find(exam => exam.value === examValue).practical,
@@ -200,6 +219,9 @@ const Marks = () => {
                     shift: shiftValue,
                     markId: response.data?.marksId,
                     examName: examItems.find(exam => exam.value === examValue).label,
+                    className: classItems.find(item => item.value === classValue)?.label,
+                    sectionName: sectionItems.find(item => item.value === sectionValue)?.label,
+                    groupName: groupItems.find(item => item.value === groupValue)?.label,
                     teacherId: parseInt(Tid),
                     mcq: examItems.find(exam => exam.value === examValue).mcq,
                     written: examItems.find(exam => exam.value === examValue).written,
@@ -220,7 +242,6 @@ const Marks = () => {
         }
     }
 
-    console.log(submitting, "submitting");
 
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
@@ -272,7 +293,7 @@ const Marks = () => {
                     <DropDownPicker
                         open={openClass}
                         value={classValue}
-                        items={classItems}
+                        items={classItems.filter(item => item.level.toLowerCase() === schoolValue)}
                         setOpen={setOpenClass}
                         setValue={setClassValue}
                         setItems={setClassItems}
@@ -318,7 +339,7 @@ const Marks = () => {
                     <DropDownPicker
                         open={openExam}
                         value={examValue}
-                        items={examItems}
+                        items={examItems.filter(item => item.classId === classValue)}
                         setOpen={setOpenExam}
                         setValue={setExamValue}
                         setItems={setExamItems}
@@ -329,13 +350,28 @@ const Marks = () => {
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
 
+                    <Text style={styles.label}>Subject</Text>
+                    <DropDownPicker
+                        open={openSubject}
+                        value={subjectValue}
+                        items={subjectItems}
+                        setOpen={setOpenSubject}
+                        setValue={setSubjectValue}
+                        setItems={setSubjectItems}
+                        placeholder="Select Subject"
+                        style={styles.dropdown}
+                        zIndex={80}
+                        disabled={!classValue}
+                        dropDownContainerStyle={styles.dropdownContainer}
+                    />
+
                     {/* Subject Display */}
-                    <Text style={styles.label}>
+                    {/* <Text style={styles.label}>
                         Subject :
                         <Text style={{ color: 'red' }}>
                             {teacherData?.Subject?.name}
                         </Text>
-                    </Text>
+                    </Text> */}
 
                     {/* Submit Button */}
                     {classValue && (groupValue || sectionValue) && (

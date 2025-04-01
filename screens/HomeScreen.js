@@ -7,27 +7,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Menus = [
     {
         item: 'Attendance',
-        icon: 'people',
+        icon: require('../assets/icons/attendance.png'),
         href: 'Attendance',
     },
     {
         item: 'Marks',
-        icon: 'edit',
+        icon: require('../assets/icons/marks.png'),
         href: 'Marks',
     },
     {
         item: 'Attendance History',
-        icon: 'history',
+        icon: require('../assets/icons/attendance-history.png'),
         href: 'Notice',
     },
     {
         item: 'Teachers',
-        icon: 'people',
+        icon: require('../assets/icons/teacher.png'),
         href: 'Teachers',
     },
     {
-        item: 'Marks History',
-        icon: 'edit',
+        item: 'Marks Sheets',
+        icon: require('../assets/icons/marks-history.png'),
         href: 'MarksList',
     },
 ];

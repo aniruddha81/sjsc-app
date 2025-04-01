@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 import { useFocusEffect } from '@react-navigation/native';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const AttendanceReport = () => {
   const navigation = useNavigation();
@@ -15,82 +16,88 @@ const AttendanceReport = () => {
 
   const [classItems, setClassItems] = useState([]);
 
-  // Fetch Attendance Data
-  // useEffect(() => {
-  //   const fetchAttendanceData = async () => {
-  //     try {
-  //       const Tid = await AsyncStorage.getItem('teacher-id');
-  //       const res = await axios.get(
-  //         `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
-  //       );
+  // Date filter state
+  const [startDate, setStartDate] = useState(dayjs().subtract(30, 'day').toDate());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-  //       // Filter records where isTaken = false
-  //       // const filteredData = res.data.filter(record => record.isTaken === false);
+  const fetchAttendanceData = async () => {
+    setLoading(true);
+    try {
+      const Tid = await AsyncStorage.getItem('teacher-id');
+      if (!Tid) throw new Error('Teacher ID not found');
 
-  //       // Sort by date in descending order
-  //       const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const res = await axios.get(
+        `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
+      );
 
-  //       setAttendanceData(sortedData);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error('Error fetching attendance data:', error);
-  //       setLoading(false);
-  //     }
-  //   };
+      const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setAttendanceData(sortedData);
 
-  //   fetchAttendanceData();
-  //   fetchClassItems();
-  // }, []);
+    } catch (error) {
+      console.error('Error fetching attendance data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      setAttendanceData([]); // Reset data to avoid inconsistencies when navigating back
+    };
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      const fetchAttendanceData = async () => {
-        try {
-          const Tid = await AsyncStorage.getItem('teacher-id');
-          const res = await axios.get(
-            `https://sjsc-backend-production.up.railway.app/api/v1/attendance/fetch/teacher-report/${Tid}`
-          );
-
-          const sortedData = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-          setAttendanceData(sortedData);
-        } catch (error) {
-          console.error('Error fetching attendance data:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
+      // Optionally clear the data or refetch when navigating back
+      setAttendanceData([]);
+      setLoading(true);
       fetchAttendanceData();
     }, [])
   );
 
-  const fetchClassItems = async () => {
-    try {
-      const res = await axios.get(`https://sjsc-backend-production.up.railway.app/api/v1/settings/fetch/class`);
-      setClassItems(res.data);
-    } catch (error) {
-      console.error('Error fetching class items:', error);
-    }
-  }
-
-
   // Handle button press
   const handleButtonPress = (item) => {
-    console.log('Button pressed for:', item);
-    navigation.navigate('ViewAttendance', { id: item });
+    if (navigation.canGoBack()) {
+      navigation.navigate('ViewAttendance', { id: item });
+    }
   };
 
   const handleTakeAttendance = (item) => {
     console.log('Take attendance for:', item);
-    navigation.navigate('TakeAttendance', {
-      classId: item.classId,
-      groupId: item.groupId,
-      sectionId: item.sectionId,
-      className: item.Class?.name,
-      groupName: item.Group?.name,
-      sectionName: item.Section?.name,
-      attendanceId: item.id,
+    if (navigation.canGoBack()) {
+      navigation.navigate('TakeAttendance', {
+        classId: item.classId,
+        groupId: item.groupId,
+        sectionId: item.sectionId,
+        className: item.Class?.name,
+        groupName: item.Group?.name,
+        sectionName: item.Section?.name,
+        attendanceId: item.id,
+      });
+    }
+  };
+
+  // Handle date change
+  const onStartDateChange = (event, selectedDate) => {
+    setShowStartDatePicker(false);
+    const currentDate = selectedDate || startDate;
+    setStartDate(currentDate);
+  };
+
+  const onEndDateChange = (event, selectedDate) => {
+    setShowEndDatePicker(false);
+    const currentDate = selectedDate || endDate;
+    setEndDate(currentDate);
+  };
+
+  const filterAttendanceData = () => {
+    return attendanceData.filter((item) => {
+      const itemDate = new Date(item.date);
+      return itemDate >= startDate && itemDate <= endDate;
     });
-  }
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -99,22 +106,58 @@ const AttendanceReport = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Attendance Reports</Text>
-      {attendanceData.length > 0 ? (
-        <FlatList
-          data={attendanceData}
-          renderItem={({ item }) => (
+
+      {/* Filter Section */}
+      <View style={styles.filterContainer}>
+        {/* <Text style={styles.filterText}>Filter by Date:</Text>  */}
+        <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
+          <Text style={styles.dateText}>{dayjs(startDate).format("D MMMM YYYY")}</Text>
+        </TouchableOpacity>
+        <Text style={{
+          fontSize: 16,
+          fontWeight: "bold",
+          marginHorizontal: 5,
+          color: "#333",
+        }}> To </Text>
+        <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
+          <Text style={styles.dateText}>{dayjs(endDate).format("D MMMM YYYY")}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Show Date Pickers if needed */}
+      {showStartDatePicker && (
+        <DateTimePicker
+          value={startDate}
+          mode="date"
+          display="default"
+          onChange={onStartDateChange}
+        />
+      )}
+      {showEndDatePicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={onEndDateChange}
+        />
+      )}
+
+      <ScrollView contentContainerStyle={{ padding: 2 }}>
+        {filterAttendanceData().length > 0 ? (
+          filterAttendanceData().map((item, index) => (
             <View
+              key={`${item.id}-${index}`}
               style={{
                 flexDirection: "row",
                 backgroundColor: "#f9f9f9",
                 alignItems: "center",
                 justifyContent: "space-between",
-                paddingHorizontal: 16, // Increased padding for better spacing
-                paddingVertical: 12, // Increased padding for better spacing
-                marginVertical: 8, // Increased margin for better separation
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                marginVertical: 4,
                 borderRadius: 10,
-                borderWidth: 1, // Added border for better visual separation
-                borderColor: "#e0e0e0", // Light border color
+                borderWidth: 1,
+                borderColor: "#e0e0e0",
               }}
             >
               {/* Date Column */}
@@ -122,14 +165,15 @@ const AttendanceReport = () => {
                 <Text style={[styles.cell, { flex: 1 }]}>
                   {dayjs(item.date).format("D MMMM")}
                 </Text>
-                <Text style={{
-                  color: item.isTaken ? "green" : "red",
-                  fontWeight: "bold",
-                }}>
+                <Text
+                  style={{
+                    color: item.isTaken ? "green" : "red",
+                    fontWeight: "bold",
+                  }}
+                >
                   {item.isTaken ? "Taken" : "Not Taken"}
                 </Text>
               </View>
-
 
               {/* Class, Group, and Section Column */}
               <View style={{ flex: 2, marginLeft: 16 }}>
@@ -153,26 +197,19 @@ const AttendanceReport = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  {/* <Text>{item.isTaken ? "Taken" : "Not Taken"}</Text> */}
-                  <Text>
-                    {item.isTaken ? <Icon
-                      name="eye"
-                      type="feather"
-                      size={18}
-                      color="#007bff"
-                    /> :
-                      "✏️"
-                    }
-                  </Text>
+                  {item.isTaken ? (
+                    <Icon name="eye" type="feather" size={18} color="#007bff" />
+                  ) : (
+                    "✏️"
+                  )}
                 </Text>
               </TouchableOpacity>
             </View>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-        />
-      ) : (
-        <Text>No attendance records found.</Text>
-      )}
+          ))
+        ) : (
+          <Text style={{ textAlign: "center", marginTop: 20 }}>No attendance data available.</Text>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -188,38 +225,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  tableHeader: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingBottom: 10,
-    marginBottom: 10,
+  filterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
   },
-  headerCell: {
-    flex: 1,
-    fontWeight: 'bold',
-    textAlign: 'center',
+  filterText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 10,
   },
-  row: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingVertical: 10,
+  dateText: {
+    fontSize: 16,
+    color: "#007bff",
+    borderWidth: 1,
+    borderColor: "#999",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    fontWeight: "bold",
   },
   cell: {
     flex: 1,
     textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 5,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
   },
 });
 

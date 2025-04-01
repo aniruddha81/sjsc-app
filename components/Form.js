@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const TeacherDropdownForm = () => {
     const navigation = useNavigation();
@@ -70,6 +72,7 @@ const TeacherDropdownForm = () => {
                 // Set Class Items
                 const classes = res.data.teacher.assignedClasses?.map(cls => ({
                     label: cls.name,
+                    level: cls.level,
                     value: cls.id,
                 }));
                 setClassItems(classes);
@@ -86,18 +89,16 @@ const TeacherDropdownForm = () => {
         fetchTeacherData();
     }, []);
 
-    // Update Group Items when Class is selected
-    // useEffect(() => {
-    //     if (teacherData) {
-    //         const shifts = teacherData.assignedShift
-    //             ?.map(shift => shift)
+    // On navigate back to this screen, reset the state
+    useFocusEffect(
+        React.useCallback(() => {
+            return () => {
+                setOpenSchool(false); 
+            };
+        }, [])
+    );
 
-    //         setShiftItems(shifts);
-    //         setGroupItems(null);
-    //         setGroupValue(null);
-    //         setSectionValue(null);
-    //     }
-    // }, [schoolValue, teacherData]);
+
 
     useEffect(() => {
         if (classValue && teacherData) {
@@ -230,6 +231,7 @@ const TeacherDropdownForm = () => {
             >
                 {/* Level Dropdown */}
                 <Text style={styles.label}>Level</Text>
+                
                 <DropDownPicker
                     open={openSchool}
                     value={schoolValue}
@@ -266,12 +268,13 @@ const TeacherDropdownForm = () => {
                 <DropDownPicker
                     open={openClass}
                     value={classValue}
-                    items={classItems}
+                    items={classItems.filter(item => item.level.toLowerCase() === schoolValue)}
                     setOpen={setOpenClass}
                     setValue={setClassValue}
                     setItems={setClassItems}
                     placeholder="Select Class"
                     style={styles.dropdown}
+                    disabled={!schoolValue}
                     zIndex={3000}
                     dropDownContainerStyle={styles.dropdownContainer}
                 />
@@ -305,7 +308,7 @@ const TeacherDropdownForm = () => {
                     style={styles.dropdown}
                     zIndex={1000}
                     disabled={!classValue}
-                    dropDownContainerStyle={styles.dropdownContainer}
+                // dropDownContainerStyle={styles.dropdownContainer}
                 />
 
                 {/* Date Picker */}

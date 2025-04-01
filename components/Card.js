@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Touchable,Image, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,11 +11,7 @@ const Card = ({ item, icon, href }) => {
         <TouchableOpacity
         onPress={() => navigation.navigate(href)}
          style={styles.card}>
-            <Icon
-                name={icon}
-                color='#302b63'
-                size={50}
-            />
+            <Image source={icon} style={{ width: 50, height: 50 }} />
             {/* <FontAwesome name="pencil" size={50} color="green" />  */}
             <Text style={styles.cardTitle}>{item}</Text>
         </TouchableOpacity>
@@ -37,7 +33,7 @@ const styles = StyleSheet.create({
         margin: 5,
     },
     cardTitle: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
         color: '#302b63',
         marginTop: 10,

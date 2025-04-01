@@ -17,7 +17,8 @@ import ViewAttendance from './screens/ViewAttendance';
 import Profile from './screens/Profile';
 import TakeMarks from './screens/TakeMarks';
 import EditMarks from './screens/EditMarks';
-import MarksList from './screens/MarksList';
+import MarksLists from './screens/MarksList';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -96,7 +97,8 @@ export default function App() {
                   title: 'Attendance',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
@@ -106,7 +108,8 @@ export default function App() {
                   title: 'Attendance',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
@@ -116,7 +119,8 @@ export default function App() {
                   title: 'Marks',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
@@ -126,7 +130,8 @@ export default function App() {
                   title: 'Attendance History',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
@@ -136,8 +141,10 @@ export default function App() {
                   title: 'Teachers',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
+                
               />
               <Stack.Screen
                 name="ViewAttendance"
@@ -146,7 +153,8 @@ export default function App() {
                   title: 'View Attendance',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
@@ -156,7 +164,8 @@ export default function App() {
                   title: 'Put Marks',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
@@ -166,17 +175,19 @@ export default function App() {
                   title: 'Edit Marks',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               <Stack.Screen
                 name="MarksList"
-                component={MarksList}
+                component={MarksLists}
                 options={{
                   title: 'Marks List',
                   headerStyle: { backgroundColor: '#eee' },
                   headerTintColor: '#111',
-                  headerTextAlign: 'center'
+                  headerTextAlign: 'center',
+                  detachPreviousScreen: false,
                 }}
               />
               {/* <Stack.Screen
