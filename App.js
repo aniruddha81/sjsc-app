@@ -1,12 +1,10 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
-import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from "@react-navigation/native";
+import { StyleSheet, View, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
-import Dashboard from './screens/Dashboard';
 import Header from './components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoginScreen from './screens/auth/Login';
 import Attendance from './screens/AttendanceForm';
 import TakeAttendance from './screens/TakeAttendance';
@@ -50,9 +48,6 @@ export default function App() {
       </View>
     );
   }
-
-
-
 
   return (
     <NavigationContainer>
