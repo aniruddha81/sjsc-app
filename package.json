@@ -30,7 +30,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@react-native-community/cli": "^18.0.0"
+    "@react-native-community/cli": "^18.0.0",
+    "typescript": "^4.9.4"
   },
   "private": true
 }
